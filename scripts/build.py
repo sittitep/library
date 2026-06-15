@@ -6,6 +6,7 @@ from pathlib import Path
 
 ARTICLES_DIR = Path("data/articles")
 SITE_DIR = Path("_site")
+BASE_PATH = "/library"
 
 def load_articles():
     articles = []
@@ -26,7 +27,9 @@ def build_article_page(article, site_dir):
     slug = meta["seo"]["slug"]
     out_dir = site_dir / "blog" / slug
     out_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy(article["content_path"], out_dir / "index.html")
+    html = article["content_path"].read_text()
+    html = html.replace('href="/blog/', f'href="{BASE_PATH}/blog/')
+    (out_dir / "index.html").write_text(html)
 
 def build_index(articles, site_dir):
     cards_html = ""
@@ -51,7 +54,7 @@ def build_index(articles, site_dir):
         {"<span class='category'>" + category + "</span>" if category else ""}
         {"<span class='reading-time'>" + reading_str + "</span>" if reading_str else ""}
       </div>
-      <h2><a href="/blog/{slug}/">{title}</a></h2>
+      <h2><a href="{BASE_PATH}/blog/{slug}/">{title}</a></h2>
       <p class="description">{description}</p>
       <div class="tags">{tags_html}</div>
     </article>"""
