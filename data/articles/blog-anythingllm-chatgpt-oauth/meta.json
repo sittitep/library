@@ -1,0 +1,252 @@
+{
+  "seo": {
+    "title": "Run AnythingLLM Free with Your ChatGPT Plus Account (OAuth Proxy Guide)",
+    "title_alternatives": [
+      "Use ChatGPT Plus as Your AnythingLLM Backend — No API Key Required",
+      "AnythingLLM + ChatGPT OAuth: Skip the OpenAI API Bill",
+      "How to Power AnythingLLM with a ChatGPT OAuth Token"
+    ],
+    "description": "Connect AnythingLLM to OpenAI using a ChatGPT Plus OAuth token instead of a paid API key. Step-by-step Docker setup, local proxy code, and the opencode trick that makes it work.",
+    "slug": "run-anythingllm-free-with-chatgpt-plus-oauth",
+    "canonical_path": "/blog/run-anythingllm-free-with-chatgpt-plus-oauth",
+    "language": "en",
+    "locale": "en_US",
+    "robots": "index,follow",
+    "keywords": [
+      "AnythingLLM",
+      "ChatGPT Plus",
+      "OAuth token",
+      "OpenAI proxy",
+      "opencode",
+      "ChatGPT backend API",
+      "free local LLM chat",
+      "OPENAI_BASE_URL",
+      "self-hosted AI chat",
+      "Docker AnythingLLM",
+      "GPT-5.4",
+      "Codex responses endpoint",
+      "OpenAI Responses API",
+      "ChatGPT-Account-Id header",
+      "JWT Bearer token OpenAI"
+    ],
+    "primary_keyword": "AnythingLLM ChatGPT OAuth",
+    "long_tail_keywords": [
+      "how to use ChatGPT Plus subscription with AnythingLLM",
+      "AnythingLLM without OpenAI API key",
+      "ChatGPT OAuth token api.responses.write missing scopes fix",
+      "AnythingLLM Docker OPENAI_BASE_URL proxy",
+      "chatgpt.com backend-api codex responses endpoint"
+    ],
+    "open_graph": {
+      "type": "article",
+      "title": "Running AnythingLLM for Free Using Your ChatGPT Plus Account",
+      "description": "Studied how opencode reuses a ChatGPT OAuth token and built a local proxy so AnythingLLM rides on your ChatGPT Plus plan — no per-request API fees.",
+      "image_alt": "Architecture diagram: AnythingLLM → local proxy → chatgpt.com backend-api",
+      "site_name": "Library"
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "AnythingLLM on ChatGPT Plus (Zero API Cost)",
+      "description": "Reverse-engineered the opencode auth flow to point AnythingLLM at chatgpt.com's backend. Full Docker + proxy walkthrough."
+    },
+    "schema_org": {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Running AnythingLLM for Free Using Your ChatGPT Plus Account",
+      "description": "Tutorial showing how to configure AnythingLLM with a ChatGPT OAuth token via a local Node.js proxy, removing the need for a paid OpenAI API key.",
+      "articleSection": "AI Tooling",
+      "keywords": "AnythingLLM, ChatGPT, OAuth, OpenAI, opencode, proxy, Docker, self-hosted AI",
+      "proficiencyLevel": "Intermediate",
+      "dependencies": "Docker, Node.js, opencode CLI, ChatGPT Plus account",
+      "inLanguage": "en-US"
+    }
+  },
+  "geo": {
+    "summary_one_line": "How to run AnythingLLM locally on Docker using a ChatGPT Plus OAuth token through a small Node.js proxy that mimics opencode's request rewriting.",
+    "summary_paragraph": "AnythingLLM normally requires a paid OpenAI API key. This guide shows how to route its requests through a local proxy on port 11435 that swaps the OpenAI API base URL for chatgpt.com/backend-api/codex/responses — the same endpoint the ChatGPT web app uses. The proxy injects a ChatGPT OAuth JWT (extracted from opencode's auth.json), strips the SDK's auto Authorization header, adds the ChatGPT-Account-Id header, forces streaming, sets store:false, remaps unsupported models to gpt-5.4, and refreshes the token automatically. AnythingLLM is pointed at the proxy via OPENAI_BASE_URL.",
+    "intent": "informational-tutorial",
+    "audience": [
+      "self-hosters",
+      "AI tinkerers",
+      "AnythingLLM users",
+      "ChatGPT Plus subscribers",
+      "developers studying OAuth proxying",
+      "opencode users"
+    ],
+    "prerequisites": [
+      "Docker installed",
+      "Active ChatGPT Plus subscription",
+      "opencode CLI installed and authenticated with OpenAI",
+      "Basic Node.js familiarity"
+    ],
+    "questions_answered": [
+      "Can I use my ChatGPT Plus subscription with AnythingLLM instead of paying for an OpenAI API key?",
+      "Why does the ChatGPT OAuth token return 401 'Missing scopes: api.responses.write' when used with the OpenAI API?",
+      "How does opencode authenticate to OpenAI using a ChatGPT login?",
+      "What endpoint does the ChatGPT web app actually call?",
+      "How do I redirect AnythingLLM's OpenAI SDK calls to a custom URL?",
+      "How do I refresh an expiring ChatGPT OAuth access token?",
+      "What is the difference between api.openai.com and chatgpt.com/backend-api/codex/responses?",
+      "How do I run AnythingLLM in Docker with persistent storage?"
+    ],
+    "key_facts": [
+      "AnythingLLM is an open-source local AI chat app from Mintplex Labs.",
+      "ChatGPT OAuth access tokens are short-lived JWTs issued by auth.openai.com.",
+      "Browser ChatGPT scopes (openid, profile, email, offline_access) do not include api.responses.write.",
+      "The ChatGPT web app calls https://chatgpt.com/backend-api/codex/responses, not api.openai.com.",
+      "opencode stores its OpenAI credentials at ~/.local/share/opencode/auth.json.",
+      "OPENAI_BASE_URL is the official OpenAI Node SDK environment variable for redirecting requests.",
+      "The ChatGPT backend endpoint requires stream:true and store:false on every request.",
+      "Models like gpt-4o must be remapped to gpt-5.4 to be accepted by the ChatGPT backend.",
+      "Token refresh is performed against https://auth.openai.com/oauth/token using the stored refresh token.",
+      "From a Docker container, the host machine is reachable via host.docker.internal."
+    ],
+    "entities": [
+      { "name": "AnythingLLM", "type": "SoftwareApplication", "url": "https://github.com/Mintplex-Labs/anything-llm" },
+      { "name": "opencode", "type": "SoftwareApplication", "url": "https://github.com/sst/opencode" },
+      { "name": "OpenAI", "type": "Organization", "url": "https://openai.com" },
+      { "name": "ChatGPT Plus", "type": "Service", "url": "https://chatgpt.com" },
+      { "name": "Docker", "type": "SoftwareApplication", "url": "https://www.docker.com/" },
+      { "name": "OpenAI Responses API", "type": "WebAPI", "url": "https://platform.openai.com/docs/api-reference/responses" },
+      { "name": "Mintplex Labs", "type": "Organization" },
+      { "name": "SST (opencode maintainers)", "type": "Organization", "url": "https://github.com/sst" }
+    ],
+    "tools_mentioned": [
+      "AnythingLLM (Docker image: mintplexlabs/anythingllm)",
+      "Docker",
+      "Node.js",
+      "opencode CLI",
+      "OpenAI Node SDK"
+    ],
+    "code_artifacts": [
+      { "name": "proxy.js", "purpose": "Translates OpenAI API requests to chatgpt.com/backend-api/codex/responses and refreshes tokens." },
+      { "name": "setup-openai-auth.js", "purpose": "Reads opencode's auth.json, verifies token expiry, writes AnythingLLM .env file." }
+    ],
+    "endpoints_referenced": [
+      "https://chatgpt.com/backend-api/codex/responses",
+      "https://auth.openai.com/oauth/token",
+      "https://api.openai.com (intentionally avoided)",
+      "http://host.docker.internal:11435/v1"
+    ],
+    "headers_required": [
+      "Authorization: Bearer <ChatGPT OAuth JWT>",
+      "ChatGPT-Account-Id: <accountId from auth.json>"
+    ],
+    "env_vars": [
+      "LLM_PROVIDER",
+      "OPEN_AI_KEY",
+      "OPEN_MODEL_PREF",
+      "OPENAI_API_KEY",
+      "OPENAI_BASE_URL",
+      "EMBEDDING_ENGINE",
+      "STORAGE_LOCATION"
+    ],
+    "error_signatures": [
+      "401 Missing scopes: api.responses.write"
+    ],
+    "claims_with_sources": [
+      {
+        "claim": "opencode rewrites OpenAI SDK requests to chatgpt.com/backend-api/codex/responses via a fetch interceptor.",
+        "source": "https://github.com/sst/opencode/blob/main/packages/opencode/src/plugin/openai/codex.ts"
+      },
+      {
+        "claim": "The OpenAI Node SDK honors OPENAI_BASE_URL for redirecting all API calls.",
+        "source": "https://github.com/openai/openai-node#baseurl"
+      },
+      {
+        "claim": "AnythingLLM's official Docker deployment uses /app/server/storage and a mounted .env file.",
+        "source": "https://github.com/Mintplex-Labs/anything-llm/blob/master/docker/HOW_TO_USE_DOCKER.md"
+      }
+    ],
+    "novelty": "Documents a working pattern — proxying AnythingLLM through the ChatGPT web backend using opencode-style OAuth — that is not described in either project's official docs.",
+    "limitations": [
+      "Relies on the undocumented chatgpt.com/backend-api/codex/responses endpoint; OpenAI may change or rate-limit it at any time.",
+      "Subject to ChatGPT Plus usage caps, not API rate limits.",
+      "Token refresh assumes opencode's auth.json schema remains stable.",
+      "Embeddings fall back to a local native model; OpenAI embeddings are not routed through this proxy.",
+      "May violate OpenAI's terms of service for ChatGPT — use at your own risk."
+    ]
+  },
+  "wiki": {
+    "title": "Running AnythingLLM for Free Using Your ChatGPT Plus Account",
+    "short_title": "AnythingLLM + ChatGPT OAuth",
+    "categories": [
+      "AI Tooling",
+      "Self-Hosted Software",
+      "OAuth",
+      "Reverse Engineering",
+      "Docker",
+      "Tutorials"
+    ],
+    "tags": [
+      "anythingllm",
+      "chatgpt",
+      "openai",
+      "oauth",
+      "opencode",
+      "proxy",
+      "docker",
+      "self-hosted",
+      "llm",
+      "responses-api",
+      "jwt",
+      "node-sdk",
+      "gpt-5.4"
+    ],
+    "topics": [
+      "OAuth token reuse across applications",
+      "Reverse-engineering undocumented APIs",
+      "Local proxy servers for SDK interception",
+      "AnythingLLM configuration",
+      "ChatGPT internal backend endpoints",
+      "OpenAI Responses API format",
+      "Docker host networking (host.docker.internal)"
+    ],
+    "related_concepts": [
+      { "term": "JWT (JSON Web Token)", "definition": "Compact, URL-safe token format used for authentication; the ChatGPT OAuth access token is a JWT." },
+      { "term": "OAuth scopes", "definition": "Permission strings attached to a token that limit which APIs it can call." },
+      { "term": "Fetch interceptor", "definition": "Wrapping of the global fetch function to modify requests/responses before they are sent." },
+      { "term": "Responses API", "definition": "OpenAI's streaming, tool-aware API that supersedes Chat Completions for agent workloads." },
+      { "term": "Reverse proxy", "definition": "A server that forwards client requests to one or more upstream servers, optionally transforming them." }
+    ],
+    "glossary": [
+      { "term": "AnythingLLM", "definition": "Open-source local AI chat application by Mintplex Labs supporting documents, web search, and agents." },
+      { "term": "opencode", "definition": "Open-source AI coding CLI by SST that authenticates to OpenAI via the ChatGPT OAuth flow." },
+      { "term": "ChatGPT OAuth token", "definition": "Short-lived JWT issued by auth.openai.com for ChatGPT web app sessions." },
+      { "term": "api.responses.write", "definition": "OAuth scope required for OpenAI's official Responses API; absent from ChatGPT web tokens." },
+      { "term": "ChatGPT-Account-Id", "definition": "HTTP header identifying which ChatGPT account a backend request belongs to." },
+      { "term": "OPENAI_BASE_URL", "definition": "Environment variable read by the OpenAI Node SDK to override the API base URL." },
+      { "term": "host.docker.internal", "definition": "Docker Desktop DNS name resolving to the host machine from inside a container." }
+    ],
+    "see_also": [
+      "Self-hosting LLM apps with Docker",
+      "OAuth 2.0 token refresh patterns",
+      "Reverse-engineering web app backends",
+      "OpenAI SDK customization",
+      "opencode plugin architecture"
+    ],
+    "references": [
+      { "title": "AnythingLLM GitHub", "url": "https://github.com/Mintplex-Labs/anything-llm" },
+      { "title": "opencode GitHub", "url": "https://github.com/sst/opencode" },
+      { "title": "opencode codex plugin source", "url": "https://github.com/sst/opencode/blob/main/packages/opencode/src/plugin/openai/codex.ts" },
+      { "title": "OpenAI Responses API docs", "url": "https://platform.openai.com/docs/api-reference/responses" },
+      { "title": "OpenAI Node SDK — baseURL", "url": "https://github.com/openai/openai-node#baseurl" },
+      { "title": "AnythingLLM Docker setup guide", "url": "https://github.com/Mintplex-Labs/anything-llm/blob/master/docker/HOW_TO_USE_DOCKER.md" }
+    ],
+    "outline": [
+      { "step": 1, "heading": "Install AnythingLLM with Docker" },
+      { "step": 2, "heading": "Understand the OAuth Token" },
+      { "step": 3, "heading": "Why You Can't Just Use the Token Directly" },
+      { "step": 4, "heading": "How opencode Solves This" },
+      { "step": 5, "heading": "Build a Local Proxy" },
+      { "step": 6, "heading": "Configure AnythingLLM" },
+      { "step": 7, "heading": "The Result" }
+    ],
+    "difficulty": "intermediate",
+    "estimated_reading_time_minutes": 7,
+    "estimated_setup_time_minutes": 30,
+    "status": "stable-experimental",
+    "license": "CC-BY-4.0",
+    "disclaimer": "This setup relies on undocumented ChatGPT backend endpoints and may violate OpenAI's terms of service. Use only on your own ChatGPT account and at your own risk."
+  }
+}
